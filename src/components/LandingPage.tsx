@@ -1,12 +1,35 @@
 
 import React from 'react';
 import { Bot, MessageSquare, Shield, Zap, ArrowRight } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
+import AuthModal from './AuthModal';
+import { useState } from 'react';
 
 interface LandingPageProps {
   onStartChat: () => void;
 }
 
 const LandingPage = ({ onStartChat }: LandingPageProps) => {
+  const { user } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+
+  const handleStartChat = () => {
+    if (user) {
+      onStartChat();
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
+  const handleGetStarted = () => {
+    if (user) {
+      onStartChat();
+    } else {
+      setShowAuthModal(true);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
@@ -23,12 +46,23 @@ const LandingPage = ({ onStartChat }: LandingPageProps) => {
             </div>
             
             <div className="flex items-center gap-4">
-              <button className="text-gray-600 hover:text-gray-900 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors">
-                Sign In
-              </button>
-              <button className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all duration-200">
-                Get Started
-              </button>
+              {user ? (
+                <div className="flex items-center gap-4">
+                  <span className="text-gray-600">Welcome, {user.email}</span>
+                  <Button onClick={onStartChat}>
+                    Go to Chat
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <Button variant="ghost" onClick={() => setShowAuthModal(true)}>
+                    Sign In
+                  </Button>
+                  <Button onClick={handleGetStarted}>
+                    Get Started
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -49,13 +83,14 @@ const LandingPage = ({ onStartChat }: LandingPageProps) => {
             and intelligent assistance with our advanced chatbot powered by cutting-edge AI models.
           </p>
           
-          <button 
-            onClick={onStartChat}
-            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 flex items-center gap-2 mx-auto"
+          <Button
+            onClick={handleStartChat}
+            size="lg"
+            className="text-lg px-8 py-4"
           >
             Start Chatting Now
-            <ArrowRight className="w-5 h-5" />
-          </button>
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         </div>
       </section>
 
@@ -73,7 +108,7 @@ const LandingPage = ({ onStartChat }: LandingPageProps) => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Public Mode</h3>
               <p className="text-gray-600 leading-relaxed">
-                Access general AI assistance with predefined knowledge bases for FAQs, onboarding, and common questions.
+                Access general AI assistance with GPT-3.5 Turbo for FAQs, onboarding, and common questions.
               </p>
             </div>
             
@@ -83,7 +118,7 @@ const LandingPage = ({ onStartChat }: LandingPageProps) => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Private Mode</h3>
               <p className="text-gray-600 leading-relaxed">
-                Create custom chatbots trained on your private documents, files, and knowledge base for personalized assistance.
+                Powered by Claude 3 Sonnet for enhanced capabilities and personalized assistance with your data.
               </p>
             </div>
             
@@ -93,7 +128,7 @@ const LandingPage = ({ onStartChat }: LandingPageProps) => {
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Lightning Fast</h3>
               <p className="text-gray-600 leading-relaxed">
-                Powered by advanced AI models through OpenRouter APIs including GPT, Claude, and Mistral for instant responses.
+                Powered by OpenRouter APIs with multiple AI models for instant, intelligent responses.
               </p>
             </div>
           </div>
@@ -109,14 +144,21 @@ const LandingPage = ({ onStartChat }: LandingPageProps) => {
           <p className="text-xl text-blue-100 mb-8 leading-relaxed">
             Join thousands of users who are already experiencing the future of AI assistance.
           </p>
-          <button 
-            onClick={onStartChat}
-            className="bg-white text-blue-600 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-50 transition-all duration-200 transform hover:scale-105"
+          <Button
+            onClick={handleStartChat}
+            variant="secondary"
+            size="lg"
+            className="text-lg px-8 py-4"
           >
             Try It Free Today
-          </button>
+          </Button>
         </div>
       </section>
+
+      {/* Auth Modal */}
+      {showAuthModal && (
+        <AuthModal onClose={() => setShowAuthModal(false)} />
+      )}
     </div>
   );
 };
